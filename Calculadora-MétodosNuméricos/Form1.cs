@@ -20,6 +20,18 @@ namespace Calculadora_MétodosNuméricos
         public Form1()
         {
             InitializeComponent();
+            txtX11.TextChanged += validarNúmero;
+            txtX12.TextChanged += validarNúmero;
+            txtX13.TextChanged += validarNúmero;
+            txtX21.TextChanged += validarNúmero;
+            txtX22.TextChanged += validarNúmero;
+            txtX23.TextChanged += validarNúmero;
+            txtX31.TextChanged += validarNúmero;
+            txtX32.TextChanged += validarNúmero;
+            txtX33.TextChanged += validarNúmero;
+            txtR1.TextChanged += validarNúmero;
+            txtR2.TextChanged += validarNúmero;
+            txtR3.TextChanged += validarNúmero;
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -92,14 +104,35 @@ namespace Calculadora_MétodosNuméricos
                 double pivote = X[k, k];
                 if (pivote == 0)
                 {
-                    Console.WriteLine("No se puede dividir entre 0. Sistema sin solución única.", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
-                }
+                    bool cambiado = false;
+                    for (int i = k + 1; i < n; i++)
+                    {
+                        if (X[i, k] != 0)
+                        {
+                            for (int j = 0; j < n; j++)
+                            {
+                                double temp = X[k, j];
+                                X[k, j] = X[i, j];
+                                X[i, j] = temp;
+                            }
+                            double tempRes = Res[k];
+                            Res[k] = Res[i];
+                            Res[i] = tempRes;
 
+                            cambiado = true;
+                            pivote = X[k, k];
+                            break;
+                        }
+                    }
+                    if (!cambiado)
+                    {
+                        MessageBox.Show("No se puede dividir entre 0 ni intercambiar filas válidas.\nSistema sin solución única.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+                }
                 for (int j = 0; j < n; j++)
                     X[k, j] /= pivote;
                 Res[k] /= pivote;
-
                 for (int i = 0; i < n; i++)
                 {
                     if (i != k)
@@ -112,6 +145,7 @@ namespace Calculadora_MétodosNuméricos
                 }
             }
         }
+
 
         void Bloqueo()
         {
@@ -128,6 +162,22 @@ namespace Calculadora_MétodosNuméricos
             txtR2.Enabled = false;
             txtR3.Enabled = false;
         }
+
+        private bool NúmeroVálido(string valor)
+        {
+            int resultado;
+            return int.TryParse(valor, out resultado);
+        }
+        private void validarNúmero(object sender, EventArgs e)
+        {
+            TextBox textBox = (TextBox)sender;
+            if (!NúmeroVálido(textBox.Text))
+            {
+                MessageBox.Show("Ingrese un valor decimal válido para el campo", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                textBox.Clear();
+            }
+        }
+
         void Verificador()
         {
             if (rb22.Checked)
